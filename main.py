@@ -15,7 +15,7 @@ from IPython.display import display
 
 def get_cookie():
     _cookies = {}
-    cookies_str = 'll="118172"; bid=1bW6v6c-hmc; _pk_id.100001.4cf6=e9e357abb806ef14.1734858374.; ap_v=0,6.0; __yadk_uid=1Gei3mKcUu5ZmWIICiZ5elpaV0mmWHBd; _vwo_uuid_v2=D063C973171AFC1BDB51F9454853AB09C|6db618b6b11d8606b0a46e589d8c4b10; _pk_ref.100001.4cf6=%5B%22%22%2C%22%22%2C1734861320%2C%22https%3A%2F%2Fwww.bing.com%2F%22%5D; _pk_ses.100001.4cf6=1; dbcl2="251895948:1e7yswZ1xYw"; ck=tk5X; push_noty_num=0; push_doumail_num=0'
+    cookies_str = 'your cookies'
     for i in cookies_str.split(';'):
         name, value = i.split('=', 1)
         _cookies[name] = value

@@ -1,5 +1,6 @@
 import re
 import time
+import os
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -10,12 +11,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from lxml import etree
 import requests
 import pandas as pd
-from IPython.display import display
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def get_cookie():
     _cookies = {}
-    cookies_str = 'your cookies'
+    cookies_str = os.environ.get('COOKIES')
     for i in cookies_str.split(';'):
         name, value = i.split('=', 1)
         _cookies[name] = value
@@ -62,6 +66,7 @@ def get_data(dom=None, cookies=None):
 
 
 cookies = get_cookie()
+print(cookies)
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.101.76 Safari/537.36'
 }
@@ -71,15 +76,16 @@ options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
 service = Service("/usr/local/bin/chromedriver")  # 替换为实际 chromedriver 路径
 driver = webdriver.Chrome(service=service, options=options)
 
-url = "https://movie.douban.com/subject/26266893/comments?sort=time&status=P"
+url = "https://movie.douban.com/subject/26266893/comments?start=60&limit=20&status=P&sort=new_score"
 driver.get(url)
 
 all_data = pd.DataFrame()
 wait = WebDriverWait(driver, 10)
 count = 0
+max = 5
 while True:
     count += 1
-    if count > 2:
+    if count >= max:
         break
     wait.until(EC.element_to_be_clickable(
         (By.CSS_SELECTOR, '#comments > div:nth-child(20) > div.comment > h3 > span.comment-info > a')))
@@ -87,10 +93,10 @@ while True:
     dom = etree.HTML(driver.page_source)
     data = get_data(dom, cookies)
     all_data = pd.concat([all_data, data], axis=0)
-
+    data.to_csv('douban.csv', index=False, mode='a', encoding='utf-8')
+    print(f'这是第{count}页')
     if not driver.find_element(By.CSS_SELECTOR, '#paginator > a.next'):
         break
-
     confirm_btn = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#paginator > a.next')))
     confirm_btn.click()
 
